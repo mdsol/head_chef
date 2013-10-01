@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require 'head_chef/cli'
+
+HeadChef::CLI.start(ARGV)
