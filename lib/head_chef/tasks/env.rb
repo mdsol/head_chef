@@ -13,21 +13,21 @@ module HeadChef
       type: :string
 
     desc 'diff', 'Shows diff between <branch> and <environment>'
-    long_desc <<-d
+    long_desc <<-EOD
       Shows diff between <branch> and <environment>.
 
       By default, uses current branch and matching enviroment
-    d
+    EOD
     def diff
       puts 'Not yet implemented...'
     end
 
     desc 'sync', 'Syncs <branch> with <environment>'
-    long_desc <<-d
+    long_desc <<-EOD
       Syncs <branch> with <environment>.
 
       By default, uses current branch and matching enviroment
-    d
+    EOD
     def sync
       branch = options[:branch] || HeadChef.current_branch
       environment = options[:environment] || branch

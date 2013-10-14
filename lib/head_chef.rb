@@ -15,7 +15,8 @@ module HeadChef
     attr_accessor :master_cookbook
     attr_accessor :ui
 
-    DEFAULT_BERKSFILE_LOCATION = 'Berksfile'
+    DEFAULT_BERKSFILE_LOCATION = './Berksfile'
+    REMOTE_BERKSFILE_DIR = '.head_chef'
 
     def ui
       @ui ||= Thor::Base.shell.new
@@ -47,11 +48,11 @@ module HeadChef
         end
 
         # File writing logic can be resolved by update to Berkshelf::Berksfile
-        unless Dir.exists? 'tmp'
-          Dir.mkdir('tmp')
+        unless Dir.exists? REMOTE_BERKSFILE_DIR
+          Dir.mkdir(REMOTE_BERKSFILE_DIR)
         end
 
-        berksfile = File.open('tmp/Berksfile', 'w') do |file|
+        berksfile = File.open("#{REMOTE_BERKSFILE_DIR}/Berksfile", 'w') do |file|
           file.write(berksfile_contents)
           file
         end
@@ -61,7 +62,7 @@ module HeadChef
     end
 
     def cleanup
-      FileUtils.rm_rf('tmp') if Dir.exists? 'tmp'
+      FileUtils.rm_rf(REMOTE_BERKSFILE_DIR) if Dir.exists? REMOTE_BERKSFILE_DIR
     end
   end
 end

@@ -9,6 +9,9 @@ describe 'HeadChef' do
 
   before(:each) do
     allow(Grit::Repo).to receive(:new).with('.').and_return(repo)
+
+    stub_const("HeadChef::DEFAULT_BERKSFILE_LOCATION", './Berksfile')
+    stub_const("HeadChef::REMOTE_BERKSFILE_DIR", '.head_chef')
   end
 
   describe 'ClassMethods' do
@@ -30,14 +33,17 @@ describe 'HeadChef' do
 
     describe '::berksfile(branch)' do
       before(:each) do
+        allow(subject).to receive(:current_branch).and_return(branch)
         allow(berksfile).to receive(:from_file).with(anything()).
           and_return(Berkshelf::Berksfile.new(''))
-        allow(subject).to receive(:current_branch).and_return(branch)
       end
 
       context 'using current branch' do
+        # Does not use constant stub, not sure why
         it 'reads Berksfile from pwd' do
-          expect(berksfile).to receive(:from_file).with('Berksfile')
+          expect(berksfile).to receive(:from_file).
+            with(HeadChef::DEFAULT_BERKSFILE_LOCATION)
+
           subject.berksfile(branch)
         end
 
@@ -52,9 +58,12 @@ describe 'HeadChef' do
         before(:each) do
           allow(File).to receive(:open).and_yield(file)
           allow(file).to receive(:write)
-          allow(file).to receive(:path).and_return('tmp/Berksfile')
+          allow(file).to receive(:path).
+            and_return("#{HeadChef::REMOTE_BERKSFILE_DIR}/Berksfile")
 
-          allow(Dir).to receive(:exists).with('tmp').and_return(true)
+          allow(Dir).to receive(:exists).
+            with(HeadChef::REMOTE_BERKSFILE_DIR).
+            and_return(true)
 
           subject.stub_chain(:master_cookbook, :git, :native).
             and_return('example Berksfile')
@@ -69,22 +78,27 @@ describe 'HeadChef' do
         end
 
         it 'creates tmp dir if it does not exist' do
-          allow(Dir).to receive(:exists?).with('tmp').and_return(false)
+          allow(Dir).to receive(:exists?).
+            with(HeadChef::REMOTE_BERKSFILE_DIR).
+            and_return(false)
 
-          expect(Dir).to receive(:mkdir).with('tmp')
+          expect(Dir).to receive(:mkdir).with(HeadChef::REMOTE_BERKSFILE_DIR)
         end
 
         it 'writes Berksfile to tmp dir' do
-          expect(File).to receive(:open).with('tmp/Berksfile', 'w')
+          expect(File).to receive(:open).
+            with("#{HeadChef::REMOTE_BERKSFILE_DIR}/Berksfile", 'w')
           expect(file).to receive(:write).with('example Berksfile')
         end
 
         it 'reads Berksfile from tmp dir' do
-          expect(berksfile).to receive(:from_file).with('tmp/Berksfile')
+          expect(berksfile).to receive(:from_file).
+            with("#{HeadChef::REMOTE_BERKSFILE_DIR}/Berksfile")
         end
 
         it 'returns Berksfile' do
-          expect(subject.berksfile('not_curr_branch')).to be_a(Berkshelf::Berksfile)
+          expect(subject.berksfile('not_curr_branch')).
+            to be_a(Berkshelf::Berksfile)
         end
 
       end
@@ -96,13 +110,19 @@ describe 'HeadChef' do
       end
 
       it 'removes tmp dir when present' do
-        allow(Dir).to receive(:exists?).with('tmp').and_return(true)
-        expect(FileUtils).to receive(:rm_rf).with('tmp')
+        allow(Dir).to receive(:exists?).
+          with(HeadChef::REMOTE_BERKSFILE_DIR).and_return(true)
+
+        expect(FileUtils).to receive(:rm_rf).
+          with(HeadChef::REMOTE_BERKSFILE_DIR)
       end
 
-      it 'does nothing when tmp dir is not present' do 
-        allow(Dir).to receive(:exists?).with('tmp').and_return(false)
-        expect(FileUtils).not_to receive(:rm_rf).with('tmp')
+      it 'does nothing when tmp dir is not present' do
+        allow(Dir).to receive(:exists?).
+          with(HeadChef::REMOTE_BERKSFILE_DIR).and_return(false)
+
+        expect(FileUtils).not_to receive(:rm_rf).
+          with(HeadChef::REMOTE_BERKSFILE_DIR)
       end
     end
   end
