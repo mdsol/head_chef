@@ -9,7 +9,7 @@ module HeadChef
         chef_versions = chef_environment.cookbook_versions
       else
         #@TODO: implement HeadChef errors w/ codes
-        HeadChef.ui.error "Environment #{environment} not found on chef server"
+        HeadChef.ui.error "Environment #{environment} not found on chef server."
         exit(1337)
       end
       # Retrieves berksfile for branch
