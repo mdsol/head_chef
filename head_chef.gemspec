@@ -26,4 +26,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "thor"
   spec.add_runtime_dependency "grit"
   spec.add_runtime_dependency "berkshelf"
+  spec.add_runtime_dependency "ridley"
 end
