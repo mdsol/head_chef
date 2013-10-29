@@ -10,8 +10,8 @@ module HeadChef
       Berkshelf.ui.mute { berksfile.update() }
 
       # Check if environment exits, if not create it
-      unless HeadChef.chef_server.environment.find(chef_environment_name)
-        HeadChef.chef_server.environment.create(name: chef_environment_name)
+      unless HeadChef.chef_server.environment.find(environment)
+        HeadChef.chef_server.environment.create(name: environment)
       end
 
       # Upload cookbooks before applying environment
@@ -21,7 +21,7 @@ module HeadChef
       # Apply without lock options argument
       HeadChef.ui.say("Applying Berksfile.lock cookbook version to " \
                       "environment #{environment}...", :cyan)
-      berksfile.apply(chef_environment_name, {})
+      berksfile.apply(environment, {})
     end
   end
 end

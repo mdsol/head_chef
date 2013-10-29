@@ -3,6 +3,7 @@ require 'spec_helper'
 describe HeadChef::Sync do
   describe 'ClassMethods' do
     let(:berksfile) { double('Berkshelf::Berksfile') }
+    let(:chef_environments) { double('Ridley::EnvironmentResource') }
     let(:environment) { 'test_env' }
     let(:branch) { 'test_branch' }
 
@@ -14,6 +15,11 @@ describe HeadChef::Sync do
 
         allow(HeadChef).to receive(:berksfile).
           with(branch).and_return(berksfile)
+        HeadChef.stub_chain(:chef_server, :environment).
+          and_return(chef_environments)
+
+        allow(chef_environments).to receive(:find).with(environment)
+        allow(chef_environments).to receive(:create).with(name: environment)
       end
 
       after(:each) do
@@ -30,6 +36,16 @@ describe HeadChef::Sync do
 
       it 'calls Berksfile#upload to push cookbooks to server' do
         expect(berksfile).to receive(:upload)
+      end
+
+      it 'checks environment exists on Chef server' do
+        expect(chef_environments).to receive(:find).with(environment)
+      end
+
+      context 'environment does not exist on Chef server' do
+        it 'creates environment' do
+          expect(chef_environments).to receive(:create).with(name: environment)
+        end
       end
 
       it 'applies Berksfile to environment' do
