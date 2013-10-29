@@ -21,6 +21,13 @@ describe 'HeadChef' do
       end
     end
 
+    describe '::chef_server' do
+      it 'creates Ridley::Client' do
+        expect(Ridley).to receive(:from_chef_config)
+        subject.chef_server
+      end
+    end
+
     describe '::current_branch' do
       before do
         repo.stub_chain(:head, :name).and_return(branch)
@@ -74,6 +81,8 @@ describe 'HeadChef' do
         end
 
         it 'reads Berksfile from local branch' do
+          # Rspec 3.0 syntax
+          #expect(subject).to receive_messages(:master_cookbook, :git, :native)
           expect(file).to receive(:write).with('example Berksfile')
         end
 

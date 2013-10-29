@@ -17,7 +17,7 @@ describe HeadChef::Sync do
         described_class.sync(branch, environment)
       end
 
-      it 'reads Berksfile from default location' do
+      it 'reads Berksfile from branch' do
         expect(HeadChef).to receive(:berksfile).with(branch)
       end
 
