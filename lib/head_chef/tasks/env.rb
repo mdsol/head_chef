@@ -19,7 +19,10 @@ module HeadChef
       By default, uses current branch and matching enviroment
     EOD
     def diff
-      puts 'Not yet implemented...'
+      branch = options[:branch] || HeadChef.current_branch
+      environment = options[:environment] || branch
+
+      Diff.diff(branch, environment)
     end
 
     desc 'sync', 'Syncs <branch> with <environment>'

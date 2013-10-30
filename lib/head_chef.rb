@@ -1,5 +1,6 @@
 # external requires
 require 'berkshelf'
+require 'ridley'
 require 'grit'
 require 'thor'
 
@@ -13,6 +14,7 @@ require_relative 'head_chef/version'
 module HeadChef
   class << self
     attr_accessor :master_cookbook
+    attr_accessor :chef_server
     attr_accessor :ui
 
     DEFAULT_BERKSFILE_LOCATION = './Berksfile'
@@ -20,6 +22,10 @@ module HeadChef
 
     def ui
       @ui ||= Thor::Base.shell.new
+    end
+
+    def chef_server
+      @chef_server ||= Ridley.from_chef_config()
     end
 
     def master_cookbook
