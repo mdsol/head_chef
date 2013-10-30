@@ -42,14 +42,14 @@ describe HeadChef::Sync do
         expect(chef_environments).to receive(:find).with(environment)
       end
 
+      it 'applies Berksfile to environment' do
+        expect(berksfile).to receive(:apply).with(environment, {})
+      end
+
       context 'environment does not exist on Chef server' do
         it 'creates environment' do
           expect(chef_environments).to receive(:create).with(name: environment)
         end
-      end
-
-      it 'applies Berksfile to environment' do
-        expect(berksfile).to receive(:apply).with(environment, {})
       end
 
     end
