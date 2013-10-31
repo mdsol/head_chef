@@ -13,6 +13,9 @@ module HeadChef
         rescue Berkshelf::BerkshelfError => e
           HeadChef.ui.error e
           Kernel.exit(e.status_code)
+        rescue Net::HTTP::Persistent::Error => e
+          HeadChef.ui.error e
+          Kernel.exit(1337)
         end
       end
     end

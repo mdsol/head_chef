@@ -3,6 +3,8 @@ module HeadChef
     def self.diff(branch, environment)
       # Retrieve dependencies from chef server first,
       # as if environment does not exist ,we can exit
+      HeadChef.ui.say("Loading environment #{environment} from chef server...",
+                     :cyan)
       chef_environment = HeadChef.chef_server.environment.find(environment)
 
       if chef_environment
@@ -16,7 +18,10 @@ module HeadChef
       berksfile = HeadChef.berksfile(branch)
 
       # Ensure lockfile is built
-      Berkshelf.ui.mute { berksfile.install }
+      HeadChef.ui.say('Updating Berksfile.lock...', :cyan)
+      Berkshelf.ui.mute { berksfile.update }
+
+      HeadChef.ui.say('Calculating diff...', :cyan)
 
       # Retrieve dependencies from lockfile
       lockfile_versions = berksfile.lockfile.to_hash[:sources]

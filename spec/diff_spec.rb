@@ -18,7 +18,7 @@ describe HeadChef::Diff do
           and_return(chef_environment)
         allow(chef_environment).to receive(:cookbook_versions).and_return({})
 
-        allow(berksfile).to receive(:install)
+        allow(berksfile).to receive(:update)
         allow(berksfile).to receive(:lockfile).and_return(lockfile)
 
         allow(lockfile).to receive(:to_hash).and_return(dependency_hash)
@@ -33,8 +33,8 @@ describe HeadChef::Diff do
         expect(HeadChef).to receive(:berksfile).with(branch)
       end
 
-      it 'runs Berksfile#install to build lockfile' do
-        expect(berksfile).to receive(:install)
+      it 'calls Berksfile#update to ensure correct lockfile' do
+        expect(berksfile).to receive(:update)
       end
 
       it 'reads Berkshelf::Lockfile dependenceis' do
