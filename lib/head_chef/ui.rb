@@ -1,5 +1,13 @@
 module HeadChef
   module UI
+    def mute!
+      @mute = true
+    end
+
+    def unmute!
+      @mute = false
+    end
+
     def error(message, color = :red)
       message = set_color(message, *color) if color
       super(message)

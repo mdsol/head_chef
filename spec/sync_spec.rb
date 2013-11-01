@@ -9,6 +9,9 @@ describe HeadChef::Sync do
     describe '::sync(branch, environment)' do
       before(:each) do
         allow(berksfile).to receive(:apply).with(environment, {})
+        allow(berksfile).to receive(:update)
+        allow(berksfile).to receive(:upload)
+
         allow(HeadChef).to receive(:berksfile).
           with(branch).and_return(berksfile)
       end
@@ -19,6 +22,14 @@ describe HeadChef::Sync do
 
       it 'reads Berksfile from branch' do
         expect(HeadChef).to receive(:berksfile).with(branch)
+      end
+
+      it 'calls Berksfile#update to ensure correct lockfile' do
+        expect(berksfile).to receive(:update)
+      end
+
+      it 'calls Berksfile#upload to push cookbooks to server' do
+        expect(berksfile).to receive(:upload)
       end
 
       it 'applies Berksfile to environment' do
