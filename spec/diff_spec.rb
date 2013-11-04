@@ -29,7 +29,7 @@ describe HeadChef::Diff do
         described_class.diff(branch, environment)
       end
 
-      it 'read Berksfile from branch' do
+      it 'reads Berksfile from branch' do
         expect(HeadChef).to receive(:berksfile).with(branch)
       end
 

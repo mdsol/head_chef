@@ -1,6 +1,12 @@
 module HeadChef
   class Sync
     def self.sync(branch, environment)
+      # Check if environment exits, if not create it
+      # Perform first, if it fails no need to continue
+      unless HeadChef.chef_server.environment.find(environment)
+        HeadChef.chef_server.environment.create(name: environment)
+      end
+
       # Retrieves berksfile for branch
       berksfile = HeadChef.berksfile(branch)
 
