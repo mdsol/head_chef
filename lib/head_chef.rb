@@ -48,8 +48,8 @@ module HeadChef
         begin
           berksfile_contents = master_cookbook.git.
             native(:show, {raise: true}, "#{branch}:Berksfile")
-        rescue Grit::Git::CommandFailed => e
-          HeadChef.ui.error e.message
+        rescue Grit::Git::CommandFailed
+          HeadChef.ui.error "Git branch #{branch} does not exist locally."
           Kernel.exit(1337)
         end
 
