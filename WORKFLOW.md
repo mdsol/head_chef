@@ -38,8 +38,11 @@ The Berksfile.lock format is like a Gemfile.lock - with locked versions for comm
 Both types of ref, the version and the git ref are derived from the metadata dependency map generated through downloading and checking each.
 
 berks on its own creates/manages the Berksfile.lock based on the latest versions of any cookbook dependencies found in the metadata.rb and refs in the Berksfile.
+
 berks update checks for newer community cookbooks and git refs from the dependency tree and puts them in the Berksfile.lock.
+
 berks upload uploads set versions / verifies those versions exist in the org.
+
 berks apply creates an environment based on the versions in the Berksfile.lock.
 
 Github PRs will be used to merge the changes down the branches.
