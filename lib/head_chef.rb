@@ -3,6 +3,7 @@ require 'berkshelf'
 require 'ridley'
 require 'grit'
 require 'thor'
+require 'semantic'
 
 # internal requires
 require_relative 'head_chef/tasks'
