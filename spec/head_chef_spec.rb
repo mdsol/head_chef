@@ -28,8 +28,15 @@ describe 'HeadChef' do
       end
     end
 
+    describe '::master_cookbook' do
+      it 'returns Grit repo' do
+        expect(subject.master_cookbook).to be_an_instance_of(Grit::Repo)
+      end
+    end
+
     describe '::current_branch' do
       before do
+        allow(subject).to receive(:master_cookbook).and_return(repo)
         repo.stub_chain(:head, :name).and_return(branch)
       end
 

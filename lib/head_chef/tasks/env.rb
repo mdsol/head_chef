@@ -22,7 +22,11 @@ module HeadChef
       branch = options[:branch] || HeadChef.current_branch
       environment = options[:environment] || branch
 
-      Diff.diff(branch, environment)
+      diff_hash = Diff.diff(branch, environment)
+      #@TODO: better way to display results
+      # should be method in this class, or to_s for collection
+      # of new objects?
+      Diff.pretty_print_diff_hash(diff_hash)
     end
 
     desc 'sync', 'Syncs <branch> with <environment>'
@@ -31,11 +35,13 @@ module HeadChef
 
       By default, uses current branch and matching enviroment
     EOD
+    option :force, banner: '', desc: 'Force upload of cookbooks to chef server'
     def sync
       branch = options[:branch] || HeadChef.current_branch
       environment = options[:environment] || branch
+      force = options[:force] ? true : false
 
-      Sync.sync(branch, environment)
+      Sync.sync(branch, environment, force)
     end
   end
 end
