@@ -8,21 +8,21 @@ describe HeadChef::Sync do
     let(:branch) { 'test_branch' }
     let(:diff_hash) { {} }
 
-    describe '::sync(branch, environment, force)' do
+    describe '::sync(environment, force)' do
       before(:each) do
         allow(berksfile).to receive(:apply).with(environment, {})
         allow(berksfile).to receive(:update)
         allow(berksfile).to receive(:upload)
 
         allow(HeadChef).to receive(:berksfile).
-          with(branch).and_return(berksfile)
+          and_return(berksfile)
         HeadChef.stub_chain(:chef_server, :environment).
           and_return(chef_environments)
 
         allow(chef_environments).to receive(:find).with(environment)
         allow(chef_environments).to receive(:create).with(name: environment)
 
-        allow(HeadChef::Diff).to receive(:diff).with(branch, environment).
+        allow(HeadChef::Diff).to receive(:diff).with(environment).
           and_return(diff_hash)
 
         allow(diff_hash).to receive(:[]).with(:conflict).and_return([])
@@ -33,7 +33,7 @@ describe HeadChef::Sync do
       end
 
       after(:each) do
-        described_class.sync(branch, environment, false)
+        described_class.sync(environment, false)
       end
 
       it 'reads environment from Chef server' do
@@ -53,12 +53,12 @@ describe HeadChef::Sync do
       end
 
       it 'performs diff of Chef environment and lockfile' do
-        expect(HeadChef::Diff).to receive(:diff).with(branch, environment)
+        expect(HeadChef::Diff).to receive(:diff).with(environment)
       end
 
       context 'with --force' do
         after(:each) do
-          described_class.sync(branch, environment, true)
+          described_class.sync(environment, true)
         end
 
         it 'calls Berksfile#upload with force option' do
@@ -67,7 +67,7 @@ describe HeadChef::Sync do
       end
 
       it 'reads Berksfile from branch' do
-        expect(HeadChef).to receive(:berksfile).with(branch)
+        expect(HeadChef).to receive(:berksfile)
       end
 
       it 'calls Berksfile#upload to push cookbooks to server' do
