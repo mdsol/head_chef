@@ -16,6 +16,12 @@ To create or update the environment for the current branch:
 head-chef env sync
 ```
 
+The sync command accepts these options: 
+
+```bash
+--force, Overwrites cookbooks on chef server 
+``` 
+
 To compare the differences between the current branch and the 
 environment in use on the Chef server:
 
@@ -26,10 +32,7 @@ head-chef env diff
 The above commands accept a number of options:
 
 ```bash
--e <environment>,      Applies to the specified branch/environment 
--b <branch>            instead of the current branch/environment 
-
---all                  Applies to each branch/environment in turn
+-e <environment>,      Applies to the specified Chef environment 
 ```
 
 
