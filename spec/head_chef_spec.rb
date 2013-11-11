@@ -8,6 +8,7 @@ describe HeadChef do
   before(:each) do
     allow(Grit::Repo).to receive(:new).with('.').and_return(repo)
 
+    stub_const("HeadChef::BERKSFILE_LOCATION", './Berksfile')
     stub_const("HeadChef::BERKSFILE_COOKBOOK_DIR", '.head_chef')
   end
 
@@ -44,7 +45,8 @@ describe HeadChef do
 
     describe '::berksfile' do
       before(:each) do
-        allow(berksfile).to receive(:from_file).with(anything()).
+        allow(berksfile).to receive(:from_file).
+          with(HeadChef::BERKSFILE_LOCATION).
           and_return(Berkshelf::Berksfile.new(''))
       end
 
