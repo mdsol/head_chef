@@ -18,8 +18,8 @@ module HeadChef
     attr_accessor :chef_server
     attr_accessor :ui
 
-    DEFAULT_BERKSFILE_LOCATION = './Berksfile'
-    REMOTE_BERKSFILE_DIR = '.head_chef'
+    BERKSFILE_LOCATION = './Berksfile'
+    BERKSFILE_COOKBOOK_DIR = '.head_chef'
 
     def ui
       @ui ||= Thor::Base.shell.new
@@ -42,34 +42,14 @@ module HeadChef
       master_cookbook.head.name
     end
 
-    def berksfile(branch)
-      if current_branch == branch
-        Berkshelf::Berksfile.from_file(DEFAULT_BERKSFILE_LOCATION)
-      else
-        begin
-          berksfile_contents = master_cookbook.git.
-            native(:show, {raise: true}, "#{branch}:Berksfile")
-        rescue Grit::Git::CommandFailed
-          HeadChef.ui.error "Git branch #{branch} does not exist locally."
-          Kernel.exit(1337)
-        end
-
-        # File writing logic can be resolved by update to Berkshelf::Berksfile
-        unless Dir.exists? REMOTE_BERKSFILE_DIR
-          Dir.mkdir(REMOTE_BERKSFILE_DIR)
-        end
-
-        berksfile = File.open("#{REMOTE_BERKSFILE_DIR}/Berksfile", 'w') do |file|
-          file.write(berksfile_contents)
-          file
-        end
-
-        Berkshelf::Berksfile.from_file(berksfile.path)
-      end
+    def berksfile
+      Berkshelf::Berksfile.from_file(BERKSFILE_LOCATION)
     end
 
     def cleanup
-      FileUtils.rm_rf(REMOTE_BERKSFILE_DIR) if Dir.exists? REMOTE_BERKSFILE_DIR
+      if Dir.exists? BERKSFILE_COOKBOOK_DIR
+        FileUtils.rm_rf(BERKSFILE_COOKBOOK_DIR)
+      end
     end
   end
 end

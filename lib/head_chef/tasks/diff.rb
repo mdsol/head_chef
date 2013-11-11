@@ -13,7 +13,7 @@ module HeadChef
       attr_accessor :diff_hash
     end
 
-    def self.diff(branch, environment)
+    def self.diff(environment)
       HeadChef.ui.say("Loading environment #{environment} from chef server...",
                      :cyan)
       chef_environment = HeadChef.chef_server.environment.find(environment)
@@ -25,8 +25,8 @@ module HeadChef
         Kernel.exit(1337)
       end
 
-      # Retrieves berksfile for branch
-      berksfile = HeadChef.berksfile(branch)
+      # Loads Berksfile into memory
+      berksfile = HeadChef.berksfile
 
       # Rebuild Berksfile.lock to ensure latest cookbooks/dependencies
       lockfile = berksfile.lockfile
@@ -37,7 +37,7 @@ module HeadChef
         File.delete(lockfile.filepath)
 
         # Reinitialize berksfile/lockfile since old lockfile was present
-        berksfile = HeadChef.berksfile(branch)
+        berksfile = HeadChef.berksfile
         lockfile = berksfile.lockfile
       end
 
