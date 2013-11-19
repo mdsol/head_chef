@@ -15,11 +15,7 @@ module HeadChef
     def diff
       environment = options[:environment] || HeadChef.current_branch
 
-      diff_hash = Diff.diff(environment)
-      #@TODO: better way to display results
-      # should be method in this class, or to_s for collection
-      # of new objects?
-      Diff.pretty_print_diff_hash(diff_hash)
+      Diff.diff(environment).pretty_print
     end
 
     desc 'sync', 'Syncs Berksfile with Chef <environment>'

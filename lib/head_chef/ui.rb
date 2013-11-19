@@ -12,6 +12,11 @@ module HeadChef
       message = set_color(message, *color) if color
       super(message)
     end
+
+    def info(message, color = :cyan)
+      message = set_color(message, *color) if color
+      super(message)
+    end
   end
 end
 
