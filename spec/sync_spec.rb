@@ -1,5 +1,8 @@
 require 'spec_helper'
 
+#@TODO: refactor/cleanup
+# Keep stubs related to tests
+# make force context for using/not using force
 describe HeadChef::Sync do
   describe 'ClassMethods' do
     let(:berksfile) { double('Berkshelf::Berksfile') }
@@ -11,7 +14,6 @@ describe HeadChef::Sync do
     describe '::sync(environment, force)' do
       before(:each) do
         allow(berksfile).to receive(:apply).with(environment, {})
-        allow(berksfile).to receive(:update)
         allow(berksfile).to receive(:upload)
 
         allow(HeadChef).to receive(:berksfile).
@@ -23,9 +25,10 @@ describe HeadChef::Sync do
         allow(chef_environments).to receive(:create).with(name: environment)
 
         allow(HeadChef::Diff).to receive(:diff).with(environment).
-          and_return(diff_hash)
+          and_return(HeadChef::CookbookDiff)
 
-        allow(diff_hash).to receive(:[]).with(:conflict).and_return([])
+        allow(HeadChef::CookbookDiff).to receive(:conflicts?)
+        allow(HeadChef::CookbookDiff).to receive(:conflicts)
 
         #@TODO: not being muted, despite it being in spec_helper
         # not sure why

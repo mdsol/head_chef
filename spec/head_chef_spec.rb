@@ -6,8 +6,6 @@ describe HeadChef do
   let(:repo) { double('Grit::Repo') }
 
   before(:each) do
-    allow(Grit::Repo).to receive(:new).with('.').and_return(repo)
-
     stub_const("HeadChef::BERKSFILE_LOCATION", './Berksfile')
     stub_const("HeadChef::BERKSFILE_COOKBOOK_DIR", '.head_chef')
   end
@@ -27,6 +25,10 @@ describe HeadChef do
     end
 
     describe '::master_cookbook' do
+      before do
+        allow(Grit::Repo).to receive(:new).with('.').and_return(repo)
+      end
+
       it 'returns Grit repo' do
         expect(subject.master_cookbook).to eq(repo)
       end
@@ -51,7 +53,7 @@ describe HeadChef do
       end
 
       it 'returns Berksfile' do
-        expect(subject.berksfile).to be_a(Berkshelf::Berksfile)
+        expect(subject.berksfile).to be_an_instance_of(Berkshelf::Berksfile)
       end
     end
 
