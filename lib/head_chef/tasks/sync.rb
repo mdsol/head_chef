@@ -1,6 +1,6 @@
 module HeadChef
   class Sync
-    def self.sync(branch, environment, force)
+    def self.sync(environment, force)
       # Check if environment exits, if not create it
       # Perform first, if it fails no need to continue
       unless HeadChef.chef_server.environment.find(environment)
@@ -10,7 +10,7 @@ module HeadChef
       # Diff now performs all Berkshelf/lockfile dependency operations
       HeadChef.ui.say("Determing side effects of sync with chef environment "\
                       "#{environment}...", :cyan)
-      diff_hash = HeadChef.ui.mute { Diff.diff(branch, environment) }
+      diff_hash = HeadChef.ui.mute { Diff.diff(environment) }
 
       unless force
         unless diff_hash[:conflict].empty?
@@ -24,7 +24,7 @@ module HeadChef
       end
 
       # Retrieve berksfile
-      berksfile = HeadChef.berksfile(branch)
+      berksfile = HeadChef.berksfile
 
       # Upload cookbooks before applying environment
       # @TODO:

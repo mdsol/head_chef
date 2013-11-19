@@ -6,13 +6,11 @@ describe HeadChef::Diff do
     let(:lockfile) { double('Berkshelf::Lockfile') }
     let(:chef_environment) { double('Hashie::Mash') }
     let(:environment) { 'test_env' }
-    let(:branch) { 'test_branch' }
     let(:diff_hash) { {} }
 
     describe '::diff' do
       before(:each) do
-        allow(HeadChef).to receive(:berksfile).with(branch).
-          and_return(berksfile)
+        allow(HeadChef).to receive(:berksfile).and_return(berksfile)
 
         HeadChef.stub_chain(:chef_server, :environment, :find).with(environment).
           and_return(chef_environment)
@@ -32,15 +30,15 @@ describe HeadChef::Diff do
       end
 
       after(:each) do
-        described_class.diff(branch, environment)
+        described_class.diff(environment)
       end
 
       it 'loads chef environment' do
         expect(chef_environment).to receive(:cookbook_versions)
       end
 
-      it 'reads Berksfile from branch' do
-        expect(HeadChef).to receive(:berksfile).with(branch)
+      it 'reads Berksfile' do
+        expect(HeadChef).to receive(:berksfile)
       end
 
       it 'calls Berksfile#update to ensure correct lockfile' do
@@ -53,7 +51,7 @@ describe HeadChef::Diff do
       end
 
       it 'returns diff hash' do
-        expect(described_class.diff(branch, environment)).to be_a(Hash)
+        expect(described_class.diff(environment)).to be_a(Hash)
       end
     end
   end

@@ -6,42 +6,35 @@ module HeadChef
       desc: 'Applies to the specified environment',
       type: :string
 
-    class_option :branch,
-      aliases: '-b',
-      banner: '<branch>',
-      desc: 'Uses the specified branch',
-      type: :string
-
-    desc 'diff', 'Shows diff between <branch> and <environment>'
+    desc 'diff', 'Shows cookbook diff between Berksfile and Chef <environment>'
     long_desc <<-EOD
-      Shows diff between <branch> and <environment>.
+      Shows cookbook version diff between Berksfile and Chef <environment>
 
-      By default, uses current branch and matching enviroment
+      By default, matches current git branch name against Chef enviroment.
     EOD
     def diff
-      branch = options[:branch] || HeadChef.current_branch
-      environment = options[:environment] || branch
+      environment = options[:environment] || HeadChef.current_branch
 
-      diff_hash = Diff.diff(branch, environment)
+      diff_hash = Diff.diff(environment)
       #@TODO: better way to display results
       # should be method in this class, or to_s for collection
       # of new objects?
       Diff.pretty_print_diff_hash(diff_hash)
     end
 
-    desc 'sync', 'Syncs <branch> with <environment>'
+    desc 'sync', 'Syncs Berksfile with Chef <environment>'
     long_desc <<-EOD
-      Syncs <branch> with <environment>.
+      Syncs Berksfile cookbook with Chef <environment>
 
-      By default, uses current branch and matching enviroment
+      By default, matches current git branch and against Chef enviroment. Chef
+      environment will be created if it does not exist.
     EOD
     option :force, banner: '', desc: 'Force upload of cookbooks to chef server'
     def sync
-      branch = options[:branch] || HeadChef.current_branch
-      environment = options[:environment] || branch
+      environment = options[:environment] || HeadChef.current_branch
       force = options[:force] ? true : false
 
-      Sync.sync(branch, environment, force)
+      Sync.sync(environment, force)
     end
   end
 end
