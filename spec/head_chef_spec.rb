@@ -18,9 +18,8 @@ describe HeadChef do
     end
 
     describe '::chef_server' do
-      it 'creates Ridley::Client' do
-        expect(Ridley).to receive(:from_chef_config).with(no_args)
-        subject.chef_server
+      it 'returns Ridley::Client' do
+        expect(subject.chef_server).to be_an_instance_of(Ridley::Client)
       end
     end
 
