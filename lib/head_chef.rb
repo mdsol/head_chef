@@ -47,7 +47,7 @@ module HeadChef
     end
 
     def cleanup
-      if Dir.exists? BERKSFILE_COOKBOOK_DIR
+      if Dir.exists?(BERKSFILE_COOKBOOK_DIR)
         FileUtils.rm_rf(BERKSFILE_COOKBOOK_DIR)
       end
     end

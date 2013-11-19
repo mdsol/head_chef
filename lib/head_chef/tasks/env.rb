@@ -10,7 +10,7 @@ module HeadChef
     long_desc <<-EOD
       Shows cookbook version diff between Berksfile and Chef <environment>
 
-      By default, matches current git branch name against Chef enviroment.
+      By default, matches current git branch name against Chef environment.
     EOD
     def diff
       environment = options[:environment] || HeadChef.current_branch

@@ -25,7 +25,6 @@ describe HeadChef::Env do
 
         it 'uses branch name for environment' do
           expect(HeadChef::Sync).to receive(:sync) do |*args|
-            puts args
             expect(args[0]).to eq(current_branch)
           end
         end
