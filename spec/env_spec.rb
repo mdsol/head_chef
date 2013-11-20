@@ -1,72 +1,84 @@
 require 'spec_helper'
 
-#@TODO: cleanup
 describe HeadChef::Env do
-  shared_examples_for 'a HeadChef::Env command' do |klass, method|
-    let(:environment) { 'option_environment' }
+  describe 'commands' do
     let(:current_branch) { 'test_branch' }
+    let(:environment) { 'option_environment' }
 
     before(:each) do
       allow(HeadChef).to receive(:current_branch).and_return(current_branch)
-      allow(HeadChef::Diff).to receive(:pretty_print_diff_hash)
 
-      # Unfreeze Thor::CoreExt::HashWithIndifferentAccess
       subject.options = subject.options.dup
     end
 
-    after(:each) do
-      subject.send(method)
-    end
-
-    context 'with --environment' do
-      before do
-        subject.options[:environment] = environment
-      end
-
-      it 'uses option value' do
-        expect(klass).to receive(method) do |*args|
-          expect(args[0]).to eq(environment)
-        end
-      end
-    end
-  end
-
-  describe 'commands' do
     describe '::sync' do
-      let(:current_branch) { 'test_branch' }
-
-      before(:each) do
-        allow(HeadChef).to receive(:current_branch).and_return(current_branch)
-
-        # Unfreeze Thor::CoreExt::HashWithIndifferentAccess
-        subject.options = subject.options.dup
-      end
-
-      it 'uses false for force option by default' do
-        expect(HeadChef::Sync).to receive(:sync) do |*args|
-          expect(args[1]).to eq(false)
-        end
+      after(:each) do
         subject.sync
       end
 
-      context 'with --force' do
-        before do
-          subject.options[:force] = true
+      context 'defaults' do
+        it 'uses false for force option' do
+          expect(HeadChef::Sync).to receive(:sync) do |*args|
+            expect(args[1]).to eq(false)
+          end
         end
 
-        it 'sets force option to true' do
+        it 'uses branch name for environment' do
           expect(HeadChef::Sync).to receive(:sync) do |*args|
-            expect(args[1]).to eq(true)
+            expect(args[0]).to eq(current_branch)
           end
-          subject.sync
         end
       end
 
-      it_should_behave_like "a HeadChef::Env command", HeadChef::Sync, :sync
+      context 'with --force' do
+        it 'sets force option to true' do
+          subject.options[:force] = true
+
+          expect(HeadChef::Sync).to receive(:sync) do |*args|
+            expect(args[1]).to eq(true)
+          end
+        end
+      end
+
+      context 'with --environment' do
+        it 'uses --enviroment option value' do
+          subject.options[:environment] = environment
+
+          expect(HeadChef::Sync).to receive(:sync) do |*args|
+            expect(args[0]).to eq(environment)
+          end
+        end
+      end
     end
 
     describe '::diff' do
-      it_should_behave_like "a HeadChef::Env command", HeadChef::Diff, :diff
+      before(:each) do
+        allow(HeadChef::Diff).to receive(:diff).and_return(HeadChef::CookbookDiff)
+        allow(HeadChef::CookbookDiff).to receive(:pretty_print)
+      end
+
+      after(:each) do
+        subject.diff
+      end
+
+      context 'defaults' do
+        it 'uses branch name for environment' do
+          expect(HeadChef::Diff).to receive(:diff).with(current_branch)
+        end
+
+        it 'outputs CookbookDiff' do
+          expect(HeadChef::CookbookDiff).to receive(:pretty_print)
+        end
+      end
+
+      context 'with --environment' do
+        it 'uses --enviroment option value' do
+          subject.options[:environment] = environment
+
+          expect(HeadChef::Diff).to receive(:diff).with(environment)
+        end
+      end
     end
+
   end
 end

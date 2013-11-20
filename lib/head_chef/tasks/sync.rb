@@ -10,13 +10,13 @@ module HeadChef
       # Diff now performs all Berkshelf/lockfile dependency operations
       HeadChef.ui.say("Determing side effects of sync with chef environment "\
                       "#{environment}...", :cyan)
-      diff_hash = HeadChef.ui.mute { Diff.diff(environment) }
+      cookbook_diff = HeadChef.ui.mute { Diff.diff(environment) }
 
       unless force
-        unless diff_hash[:conflict].empty?
+        if cookbook_diff.conflicts?
           HeadChef.ui.error 'The following cookbooks are in conflict:'
-          diff_hash[:conflict].each do |cookbook_hash|
-            HeadChef.ui.error "#{cookbook_hash[:cookbook_name]}: #{cookbook_hash[:version]}"
+          cookbook_diff.conflicts.each do |cookbook|
+            HeadChef.ui.error "#{cookbook.name}: #{cookbook.berkshelf_version}"
           end
           HeadChef.ui.error 'Use --force to sync environment'
           Kernel.exit(1337)
@@ -26,10 +26,6 @@ module HeadChef
       # Retrieve berksfile
       berksfile = HeadChef.berksfile
 
-      # Upload cookbooks before applying environment
-      # @TODO:
-      # pass in cookbook diff, only cookbook bumps/rewrites, no removals
-      # force upload only on conflict cookbooks, otherwise just upload
       HeadChef.ui.say('Uploading cookbooks to chef server...', :cyan)
       berksfile.upload({force: force})
 

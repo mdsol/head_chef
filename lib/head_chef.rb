@@ -4,9 +4,12 @@ require 'ridley'
 require 'grit'
 require 'thor'
 require 'semantic'
+require 'pathname'
 
 # internal requires
 require_relative 'head_chef/tasks'
+require_relative 'head_chef/cookbook'
+require_relative 'head_chef/cookbook_diff'
 require_relative 'head_chef/ui'
 require_relative 'head_chef/version'
 
@@ -14,9 +17,6 @@ require_relative 'head_chef/version'
 #Create custom errors
 module HeadChef
   class << self
-    attr_accessor :master_cookbook
-    attr_accessor :chef_server
-    attr_accessor :ui
 
     BERKSFILE_LOCATION = './Berksfile'
     BERKSFILE_COOKBOOK_DIR = '.head_chef'
@@ -43,11 +43,11 @@ module HeadChef
     end
 
     def berksfile
-      Berkshelf::Berksfile.from_file(BERKSFILE_LOCATION)
+      @berksfile ||= Berkshelf::Berksfile.from_file(BERKSFILE_LOCATION)
     end
 
     def cleanup
-      if Dir.exists? BERKSFILE_COOKBOOK_DIR
+      if Dir.exists?(BERKSFILE_COOKBOOK_DIR)
         FileUtils.rm_rf(BERKSFILE_COOKBOOK_DIR)
       end
     end
