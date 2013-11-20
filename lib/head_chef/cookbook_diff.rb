@@ -10,35 +10,30 @@ module HeadChef
                      conflict: [] }
     end
 
-    # @TODO: cleanup.
-    # THIS IS GROSS, too many returns
+    # @TODO: cleanup
+    # @TODO: switch statements
     def add(cookbook)
-      # Removal is only operation that does not require a diff, as no cookbook 
-      # will be uploaded
+      # Removal is the only operation that does not require a diff, as no
+      # cookbook will be uploaded
       if cookbook.chef_version && !cookbook.berkshelf_version
-        @diff_hash[:remove] << cookbook
-        return
+        @diff_hash[:remove] << cookbook and return
       end
 
       unless cookbook.diff
-        @diff_hash[:conflict] << cookbook
-        return
+        @diff_hash[:conflict] << cookbook and return
       end
 
       if cookbook.berkshelf_version && !cookbook.chef_version
-        @diff_hash[:add] << cookbook
-        return
+        @diff_hash[:add] << cookbook and return
       end
 
       berkshelf_version = Semantic::Version.new(cookbook.berkshelf_version)
       chef_version = Semantic::Version.new(cookbook.chef_version)
 
       if berkshelf_version > chef_version
-        @diff_hash[:update] << cookbook
-        return
+        @diff_hash[:update] << cookbook and return
       elsif berkshelf_version < chef_version
-        @diff_hash[:revert] << cookbook
-        return
+        @diff_hash[:revert] << cookbook and return
       end
     end
 

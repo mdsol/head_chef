@@ -1,7 +1,7 @@
 require 'digest'
 
 module HeadChef
-  class Cookbook #extend Ridley::Chef::Cookbook?
+  class Cookbook
     #@TODO: add enum for methods
 
     attr_reader :name
@@ -18,10 +18,8 @@ module HeadChef
     def diff
       # Get file checksums from chef server
       cookbook_resource = HeadChef.chef_server.cookbook.find(@name, @berkshelf_version)
-      unless cookbook_resource
-        # Cookbook not present on chef server
-        return true
-      end
+      # Cookbook not present on chef server
+      return true unless cookbook_resource
 
       # Get cookbook from berkshelf cookbook cache
       # NOTE: requires berks install/update to be run to ensure cache is
@@ -32,25 +30,18 @@ module HeadChef
       berkshelf_cookbook = HeadChef.berksfile.cached_cookbooks.find do |cb|
         cb.name == "#{@name}-#{@berkshelf_version}"
       end
-      unless berkshelf_cookbook
-        # Cookbook will not be uploading since it is not in
-        # Berksfile.lock
-        return true
-      end
+      # Cookbook will not be uploaded since it is not in Berksfile.lock
+      return true unless berkshelf_cookbook
 
-      berkshelf_cookbook_path = berkshelf_cookbook.path
 
       # Diff files
       cookbook_files_mashes = files_from_manifest(cookbook_resource.manifest)
-      cookbook_files_mashes.each do |cookbook_file_mash|
 
-        berkshelf_cookbook_file = "#{berkshelf_cookbook_path}/#{cookbook_file_mash.path}"
+      cookbook_files_mashes.each do |cookbook_file_mash|
+        berkshelf_cookbook_file = "#{berkshelf_cookbook.path}/#{cookbook_file_mash.path}"
         berkshelf_cookbook_checksum = checksum_file(berkshelf_cookbook_file) if File.exists?(berkshelf_cookbook_file)
 
-        unless berkshelf_cookbook_checksum == cookbook_file_mash.checksum
-          # Conflict present in cookbooks
-          return false
-        end
+        return false unless berkshelf_cookbook_checksum == cookbook_file_mash.checksum
       end
 
       true
@@ -66,6 +57,7 @@ module HeadChef
 
     private
 
+    # Taken from Chef
     def checksum_file(file)
       File.open(file, 'rb') { |f| checksum_io(f, Digest::MD5.new) }
     end
@@ -78,15 +70,7 @@ module HeadChef
     end
 
     def files_from_manifest(manifest)
-      file_mashes = []
-
-      manifest.each do |folder, mashes|
-        mashes.each do |mash|
-          file_mashes << mash
-        end
-      end
-
-      file_mashes
+      manifest.map { |folder, mashes| mashes }.flatten
     end
   end
 end
