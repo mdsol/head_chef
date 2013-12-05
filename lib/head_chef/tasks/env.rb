@@ -18,6 +18,18 @@ module HeadChef
       Diff.diff(environment).pretty_print
     end
 
+    desc 'list', 'Lists cookbooks with versions from Chef <environment>.'
+    long_desc <<-EOD
+      Shows cookbook version diff between Berksfile and Chef <environment>
+
+      By default, matches current git branch name against Chef enviroment.
+    EOD
+    def list
+      environment = options[:environment] || HeadChef.current_branch
+
+      List.list(environment)
+    end
+
     desc 'sync', 'Syncs Berksfile with Chef <environment>'
     long_desc <<-EOD
       Syncs Berksfile cookbook with Chef <environment>
