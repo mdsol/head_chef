@@ -16,10 +16,14 @@ require_relative 'head_chef/version'
 #@TODO: establish head_chef exit codes
 #Create custom errors
 module HeadChef
-  class << self
 
-    BERKSFILE_LOCATION = './Berksfile'
-    BERKSFILE_COOKBOOK_DIR = '.head_chef'
+  BERKSFILE_LOCATION = 'Berksfile'.freeze
+  BERKSFILE_COOKBOOK_DIR = '.head_chef'.freeze
+
+  class << self
+    def root
+      @root ||= Pathname.new(File.expand_path('../', File.dirname(__FILE__)))
+    end 
 
     def ui
       @ui ||= Thor::Base.shell.new
@@ -29,10 +33,14 @@ module HeadChef
       @chef_server ||= Ridley.from_chef_config()
     end
 
+    # @TODO: refactor?
+    # Is grit necessary to get current branch, is shell command sufficient?
+    # This can look up dir's until it finds .git dir
     def master_cookbook
       begin
         @master_cookbook ||= Grit::Repo.new('.')
       rescue Grit::InvalidGitRepositoryError
+        puts Dir.pwd
         HeadChef.ui.error 'head_chef must be run in root of git repo'
         Kernel.exit(1337)
       end

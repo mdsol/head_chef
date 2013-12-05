@@ -45,7 +45,20 @@ module HeadChef
       !@diff_hash[:conflict].empty?
     end
 
+    def empty?
+      [:add, :update, :remove, :revert, :conflict].each do |method|
+        return false if !@diff_hash[method].empty?
+      end
+
+      true
+    end
+
     def pretty_print
+      if self.empty?
+        HeadChef.ui.say("Berksfile and Chef environment are identical", :green)
+        return
+      end
+
       colors = { add: :green,
                  update: :green,
                  remove: :red,
