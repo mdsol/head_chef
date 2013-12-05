@@ -18,8 +18,14 @@ describe HeadChef do
     end
 
     describe '::chef_server' do
+      let(:ridley_client) { double('Ridley::Client') }
+
+      before do
+        allow(Ridley).to receive(:from_chef_config).and_return(ridley_client)
+      end
+
       it 'returns Ridley::Client' do
-        expect(subject.chef_server).to be_an_instance_of(Ridley::Client)
+        expect(subject.chef_server).to eq(ridley_client)
       end
     end
 
