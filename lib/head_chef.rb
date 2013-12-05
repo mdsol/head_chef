@@ -23,7 +23,7 @@ module HeadChef
   class << self
     def root
       @root ||= Pathname.new(File.expand_path('../', File.dirname(__FILE__)))
-    end 
+    end
 
     def ui
       @ui ||= Thor::Base.shell.new
