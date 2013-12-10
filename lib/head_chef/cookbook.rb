@@ -33,9 +33,16 @@ module HeadChef
       # Cookbook will not be uploaded since it is not in Berksfile.lock
       return true unless berkshelf_cookbook
 
-      # Diff files
       cookbook_files_mashes = files_from_manifest(cookbook_resource.manifest)
 
+      # Diff file lists
+      cookbook_files = cookbook_files_mashes.map { |mash| mash.path }.flatten
+      berkshelf_files = remove_ignored_files(berkshelf_cookbook.path)
+
+      return false unless ((cookbook_files - berkshelf_files) +
+                           (berkshelf_files - cookbook_files)).empty?
+
+      # Diff file contents
       cookbook_files_mashes.each do |cookbook_file_mash|
         berkshelf_cookbook_file = "#{berkshelf_cookbook.path}/#{cookbook_file_mash.path}"
         berkshelf_cookbook_checksum = checksum_file(berkshelf_cookbook_file) if File.exists?(berkshelf_cookbook_file)
@@ -56,6 +63,10 @@ module HeadChef
 
     private
 
+    def files_from_manifest(manifest)
+      manifest.map { |folder, mashes| mashes }.flatten
+    end
+
     # Taken from Chef
     def checksum_file(file)
       File.open(file, 'rb') { |f| checksum_io(f, Digest::MD5.new) }
@@ -68,8 +79,38 @@ module HeadChef
       digest.hexdigest
     end
 
-    def files_from_manifest(manifest)
-      manifest.map { |folder, mashes| mashes }.flatten
+    def remove_ignored_files(path)
+      file_list = []
+      Dir.chdir(path) do
+        file_list = Dir['**/*'].select { |f| File.file?(f) }
+      end
+
+      ignore_file = File.join(path, 'chefignore')
+      ignore_globs = parse_ignore_file(ignore_file)
+
+      remove_ignores_from(file_list, ignore_globs)
     end
+
+    def remove_ignores_from(file_list, ignore_globs)
+      Array(file_list).inject([]) do |unignored, file|
+        ignored?(file, ignore_globs) ? unignored : unignored << file
+      end
+    end
+
+    def ignored?(file_name, ignores)
+      ignores.any? { |glob| File.fnmatch?(glob, file_name) }
+    end
+
+    def parse_ignore_file(ignore_file)
+      ignore_globs = []
+      if File.exist?(ignore_file) && File.readable?(ignore_file) &&
+        (File.file?(ignore_file) || File.symlink?(ignore_file))
+        File.foreach(ignore_file) do |line|
+          ignore_globs << line.strip unless line =~ /^\s*(?:#.*)?$/
+        end
+      end
+      ignore_globs
+    end
+
   end
 end

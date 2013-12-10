@@ -39,6 +39,7 @@ describe HeadChef::Cookbook do
         allow(cached_cookbooks).to receive(:find).and_return(cached_cookbook)
 
         allow(cached_cookbook).to receive(:path)
+        allow(subject).to receive(:remove_ignored_files).and_return([])
       end
 
       after(:each) do

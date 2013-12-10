@@ -8,7 +8,7 @@ CHEF_SERVER_PORT = 6267
 
 Before do
   clean_tmp_path
-  
+
   # Set up paths
   Dir.chdir(tmp_path) # ruby dir
   @dirs                 = tmp_path # aruba dir
@@ -27,13 +27,13 @@ Before do
   `GIT_DIR="#{tmp_path.join('.git').expand_path}" git init --quiet`
 
   HeadChef::RSpec::ChefServer.start(port: CHEF_SERVER_PORT)
- 
+
   @aruba_timeout_seconds = 10
 end
 
 After do
   HeadChef::RSpec::ChefServer.reset!
-  
+
   if File.exists?(tmp_path.join('Berksfile.lock').expand_path)
     FileUtils.rm tmp_path.join('Berksfile.lock').expand_path 
   end
