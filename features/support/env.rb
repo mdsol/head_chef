@@ -28,7 +28,7 @@ Before do
 
   HeadChef::RSpec::ChefServer.start(port: CHEF_SERVER_PORT)
  
-  @aruba_timeout_seconds = 5
+  @aruba_timeout_seconds = 10
 end
 
 After do

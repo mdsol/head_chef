@@ -33,7 +33,6 @@ module HeadChef
       # Cookbook will not be uploaded since it is not in Berksfile.lock
       return true unless berkshelf_cookbook
 
-
       # Diff files
       cookbook_files_mashes = files_from_manifest(cookbook_resource.manifest)
 

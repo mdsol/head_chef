@@ -60,7 +60,7 @@ Given(/^the Chef Server has the following cookbooks uploaded:$/) do |cookbooks|
   ridley = Ridley.from_chef_config()
 
   cookbooks.raw.each do |name, version, path|
-    ridley.cookbook.upload(path)
+    ridley.cookbook.upload(self.send(path.to_sym, name))
   end
 end
 

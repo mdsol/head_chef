@@ -2,8 +2,17 @@ require 'erubis'
 
 Given(/^the Berksfile has the following cookbooks:$/) do |cookbooks|
   berksfile_template = Erubis::Eruby.new(File.read('../spec/fixtures/Berksfiles/template.erb'))
+
+
+  berkshelf_entries = cookbooks.raw.map do |cookbook|
+    cookbook_path = self.send(cookbook[2].to_sym, cookbook[0])
+
+    cookbook[2] = "path: '#{cookbook_path}'"
+    cookbook
+  end
+
   context = {
-    cookbooks: cookbooks.raw
+    cookbooks: berkshelf_entries
   }
 
   File.open('Berksfile', 'w') do |file|

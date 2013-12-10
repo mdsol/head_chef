@@ -5,7 +5,7 @@ Feature: head-chef env diff
 
   Scenario: Diff with same version constraints
     Given the Berksfile has the following cookbooks:
-      | test_cookbook | 0.1.0 | path: '/Users/mcorwin/projects/head_chef/spec/fixtures/cookbooks/test_cookbook/' |
+      | test_cookbook | 0.1.0 | cookbook_path |
     And the environment "test" has the following cookbook version constraints:
       | test_cookbook | 0.1.0 |
     When I run `head-chef env diff`
@@ -13,9 +13,9 @@ Feature: head-chef env diff
 
   Scenario: Diff with a cookbook conflict
     Given the Berksfile has the following cookbooks:
-      | test_cookbook | 0.1.0 | path: '/Users/mcorwin/projects/head_chef/spec/fixtures/cookbooks/test_cookbook_conflict/' |
+      | test_cookbook | 0.1.0 | conflict_path |
     And the Chef Server has the following cookbooks uploaded:
-      | test_cookbook | 0.1.0 | /Users/mcorwin/projects/head_chef/spec/fixtures/cookbooks/test_cookbook/ |
+      | test_cookbook | 0.1.0 | cookbook_path |
     And the environment "test" has the following cookbook version constraints:
       | test_cookbook | 0.1.0 |
     When I run `head-chef env diff`
@@ -23,7 +23,7 @@ Feature: head-chef env diff
 
   Scenario: Diff with a cookbook add
     Given the Berksfile has the following cookbooks:
-      | test_cookbook | 0.1.0 | path: '/Users/mcorwin/projects/head_chef/spec/fixtures/cookbooks/test_cookbook/' |
+      | test_cookbook | 0.1.0 | cookbook_path |
     And the environment "test" does not have the following cookbook version constraints:
       | test_cookbook | 0.1.0 |
     When I run `head-chef env diff`
@@ -31,7 +31,7 @@ Feature: head-chef env diff
 
   Scenario: Diff with a cookbook update
     Given the Berksfile has the following cookbooks:
-      | test_cookbook | 0.1.0 | path: '/Users/mcorwin/projects/head_chef/spec/fixtures/cookbooks/test_cookbook/' |
+      | test_cookbook | 0.1.0 | cookbook_path |
     And the environment "test" has the following cookbook version constraints:
       | test_cookbook | 0.0.1 |
     When I run `head-chef env diff`
@@ -47,7 +47,7 @@ Feature: head-chef env diff
 
   Scenario: Diff with a cookbook revert
     Given the Berksfile has the following cookbooks:
-      | test_cookbook | 0.1.0 | path: '/Users/mcorwin/projects/head_chef/spec/fixtures/cookbooks/test_cookbook/' |
+      | test_cookbook | 0.1.0 | cookbook_path |
     And the environment "test" has the following cookbook version constraints:
       | test_cookbook | 0.2.0 |
     When I run `head-chef env diff`

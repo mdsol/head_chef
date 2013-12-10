@@ -13,6 +13,18 @@ module HeadChef
         tmp_path.join('.berkshelf').expand_path
       end
 
+      def cookbook_store
+        fixtures_path.join('cookbooks').expand_path
+      end
+
+      def cookbook_path(cookbook_name)
+        "#{cookbook_store}/#{cookbook_name}"
+      end
+
+      def conflict_path(cookbook_name)
+        "#{cookbook_path(cookbook_name)}_conflict"
+      end
+
       def clean_tmp_path
         FileUtils.rm_rf(tmp_path)
         FileUtils.mkdir_p(tmp_path)
