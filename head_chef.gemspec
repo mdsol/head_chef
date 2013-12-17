@@ -8,20 +8,24 @@ Gem::Specification.new do |spec|
   spec.version       = HeadChef::VERSION
   spec.authors       = ["Mark Corwin"]
   spec.email         = ["mcorwin@mdsol.com"]
-  spec.description   = %q{Head Chef is a chef environment manager built on Berkshelf/Thor} 
-  spec.summary       = %q{Chef environment manager}
+  spec.description   = %q{Head Chef is a Chef workflow CLI built on Berkshelf}
+  spec.summary       = %q{Chef workflow tool}
   spec.homepage      = "https://github.com/mdsol/head_chef"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
-  spec.executables   = 'head_chef'
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
-  spec.require_paths = ["lib"]
+  spec.executables   = spec.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
+  spec.test_files    = spec.files.grep(%r{^(spec|features)/})
+  spec.require_paths = ['lib']
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "cucumber"
+  spec.add_development_dependency "aruba"
+  spec.add_development_dependency "chef-zero"
+  spec.add_development_dependency "erubis"
+  spec.add_development_dependency "ridley"
 
   spec.add_runtime_dependency "thor"
   spec.add_runtime_dependency "grit"

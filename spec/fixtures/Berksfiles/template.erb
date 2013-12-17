@@ -1,0 +1,5 @@
+site :opscode
+
+<% @cookbooks.each do |cookbook| %>
+<%= "cookbook '#{cookbook[0]}', '#{cookbook[1]}', #{cookbook[2]}" %>
+<% end %>
