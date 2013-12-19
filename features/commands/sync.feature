@@ -51,7 +51,7 @@ Feature: head-chef env sync
 
   Scenario: Sync with cookbook conflict without force option
     Given the Berksfile has the following cookbooks:
-      | test_cookbook | 0.1.0 | conflict_path |
+      | test_cookbook | 0.1.0 | file_list_conflict_path |
     And the Chef Server has the following cookbooks uploaded:
       | test_cookbook | 0.1.0 | cookbook_path |
     When I run `head-chef env sync`

@@ -11,9 +11,19 @@ Feature: head-chef env diff
     When I run `head-chef env diff`
     Then the output should contain "identical"
 
-  Scenario: Diff with a cookbook conflict
+  Scenario: Diff with a cookbook file list conflict
     Given the Berksfile has the following cookbooks:
-      | test_cookbook | 0.1.0 | conflict_path |
+      | test_cookbook | 0.1.0 | file_list_conflict_path |
+    And the Chef Server has the following cookbooks uploaded:
+      | test_cookbook | 0.1.0 | cookbook_path |
+    And the environment "test" has the following cookbook version constraints:
+      | test_cookbook | 0.1.0 |
+    When I run `head-chef env diff`
+    Then the output should contain "CONFLICT"
+
+  Scenario: Diff with a cookbook file content conflict
+    Given the Berksfile has the following cookbooks:
+      | test_cookbook | 0.1.0 | file_content_conflict_path |
     And the Chef Server has the following cookbooks uploaded:
       | test_cookbook | 0.1.0 | cookbook_path |
     And the environment "test" has the following cookbook version constraints:

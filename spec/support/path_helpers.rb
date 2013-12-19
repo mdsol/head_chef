@@ -21,8 +21,12 @@ module HeadChef
         "#{cookbook_store}/#{cookbook_name}"
       end
 
-      def conflict_path(cookbook_name)
-        "#{cookbook_path(cookbook_name)}_conflict"
+      def file_content_conflict_path(cookbook_name)
+        "#{cookbook_path(cookbook_name)}_file_content_conflict"
+      end
+
+      def file_list_conflict_path(cookbook_name)
+        "#{cookbook_path(cookbook_name)}_file_list_conflict"
       end
 
       def clean_tmp_path
