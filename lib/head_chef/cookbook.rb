@@ -1,4 +1,5 @@
 require 'digest'
+require 'set'
 
 module HeadChef
   class Cookbook
@@ -36,11 +37,10 @@ module HeadChef
       cookbook_files_mashes = files_from_manifest(cookbook_resource.manifest)
 
       # Diff file lists
-      cookbook_files = cookbook_files_mashes.map { |mash| mash.path }.flatten
-      berkshelf_files = remove_ignored_files(berkshelf_cookbook.path)
+      cookbook_files = Set.new(cookbook_files_mashes.map(&:path))
+      berkshelf_files = Set.new(remove_ignored_files(berkshelf_cookbook.path))
 
-      return false unless ((cookbook_files - berkshelf_files) +
-                           (berkshelf_files - cookbook_files)).empty?
+      return false unless berkshelf_files == cookbook_files
 
       # Diff file contents
       cookbook_files_mashes.each do |cookbook_file_mash|
@@ -64,7 +64,7 @@ module HeadChef
     private
 
     def files_from_manifest(manifest)
-      manifest.map { |folder, mashes| mashes }.flatten
+      manifest.values.flatten
     end
 
     # Taken from Chef
@@ -80,9 +80,8 @@ module HeadChef
     end
 
     def remove_ignored_files(path)
-      file_list = []
-      Dir.chdir(path) do
-        file_list = Dir['**/*'].select { |f| File.file?(f) }
+      file_list = Dir.chdir(path) do
+        Dir['**/*'].select { |f| File.file?(f) }
       end
 
       ignore_file = File.join(path, 'chefignore')
@@ -92,8 +91,8 @@ module HeadChef
     end
 
     def remove_ignores_from(file_list, ignore_globs)
-      Array(file_list).inject([]) do |unignored, file|
-        ignored?(file, ignore_globs) ? unignored : unignored << file
+      file_list.reject do |file|
+        ignored?(file, ignore_globs)
       end
     end
 
@@ -102,14 +101,14 @@ module HeadChef
     end
 
     def parse_ignore_file(ignore_file)
-      ignore_globs = []
-      if File.exist?(ignore_file) && File.readable?(ignore_file) &&
+      [].tap do |ignore_globs|
+        if File.exist?(ignore_file) && File.readable?(ignore_file) &&
         (File.file?(ignore_file) || File.symlink?(ignore_file))
-        File.foreach(ignore_file) do |line|
-          ignore_globs << line.strip unless line =~ /^\s*(?:#.*)?$/
+          File.foreach(ignore_file) do |line|
+            ignore_globs << line.strip unless line =~ /^\s*(?:#.*)?$/
+          end
         end
       end
-      ignore_globs
     end
 
   end
