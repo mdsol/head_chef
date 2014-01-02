@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "chef-zero"
   spec.add_development_dependency "erubis"
   spec.add_development_dependency "ridley"
+  spec.add_development_dependency "hashie"
 
   spec.add_runtime_dependency "thor"
   spec.add_runtime_dependency "grit"

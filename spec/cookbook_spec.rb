@@ -32,13 +32,14 @@ describe HeadChef::Cookbook do
         allow(cookbook_resource).to receive(:find).
           with(subject.name, subject.berkshelf_version).
           and_return(cookbook_resource)
-        allow(cookbook_resource).to receive(:manifest).and_return([])
+        allow(cookbook_resource).to receive(:manifest).and_return(Hashie::Mash.new)
 
         HeadChef.stub_chain(:berksfile, :cached_cookbooks).
           and_return(cached_cookbooks)
         allow(cached_cookbooks).to receive(:find).and_return(cached_cookbook)
 
         allow(cached_cookbook).to receive(:path)
+        allow(subject).to receive(:remove_ignored_files).and_return([])
       end
 
       after(:each) do
