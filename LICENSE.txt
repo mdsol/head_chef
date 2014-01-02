@@ -1,4 +1,4 @@
-Copyright (c) 2013 Mark Corwin
+Copyright (c) 2013 Medidata
 
 MIT License
 
