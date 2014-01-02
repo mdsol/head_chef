@@ -1,48 +1,28 @@
 require 'head_chef'
-require 'thor'
 
 module HeadChef
-  class Env < Thor
-    class_option :environment,
-      aliases: '-e',
-      banner: '<environment>',
-      desc: 'Applies to the specified environment',
-      type: :string
+  class Cli < Thor
 
-    class_option :branch,
-      aliases: '-b',
-      banner: '<branch>',
-      desc: 'Uses the specified branch',
-      type: :string
-
-    class_option :all,
-      banner: '',
-      desc: 'Applies each branch to matching environment'
-
-    desc 'diff', 'Shows diff between <branch> and <environment>'
-    long_desc <<-d
-      Shows diff between <branch> and <environment>.
-
-      By default, uses current branch and matching enviroment
-    d
-    def diff
-      #@TODO
+    # This is the main entry point for CLI.
+    # It wraps the Thor start command to provide error handling.
+    class << self
+      def start(given_args=ARGV, config={})
+        begin
+          super
+          HeadChef.cleanup
+        rescue Berkshelf::BerkshelfError => e
+          HeadChef.ui.error e
+          Kernel.exit(e.status_code)
+        rescue Ridley::Errors::HTTPError => e
+          HeadChef.ui.error "#{e.class}: #{e} \nEndpoint: #{e.env[:url]}"
+          Kernel.exit(1337)
+        end
+      end
     end
 
-    desc 'sync', 'Syncs <branch> with <environment>'
-    long_desc <<-d
-      Syncs <branch> with <environment>.
+    namespace 'head_chef'
 
-      By default, uses current branch and matching enviroment
-    d
-    def sync
-      #@TODO
-    end
-  end
-
-  class CLI < Thor
     desc "env", "Sync and diff branches with Chef enviroments"
     subcommand "env", Env
   end
-
 end
