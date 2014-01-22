@@ -81,7 +81,7 @@ module HeadChef
 
     def remove_ignored_files(path)
       file_list = Dir.chdir(path) do
-        Dir['**/*'].select { |f| File.file?(f) }
+        Dir['**/{*,.*}'].select { |f| File.file?(f) }
       end
 
       ignore_file = File.join(path, 'chefignore')
