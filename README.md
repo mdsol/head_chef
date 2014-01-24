@@ -1,4 +1,6 @@
 #Head Chef
+_Trust your environments…_
+
 Manage Chef Environments with Berkshelf, Ridley, and Git
 
 #Installation
@@ -14,15 +16,15 @@ gem install head_chef
 ```
 
 #Usage
-Head Chef manages Chef Enviroments using [Berkshelf](https://github.com/berkshelf/berkshelf). Chef Server connections are made via [Ridley](https://github.com/RiotGames/ridley), and are controlled by a [`knife.rb`](http://docs.opscode.com/config_rb_knife.html) file, which should be located in a `.chef` directory. Head Chef will use the closest `.chef/knife.rb` found in its or its parents directories, identical to the Chef CLI tool [`Knife`](http://docs.opscode.com/knife.html). 
+Head Chef manages Chef Enviroments using [Berkshelf](https://github.com/berkshelf/berkshelf). Chef Server connections are made via [Ridley](https://github.com/RiotGames/ridley), and are controlled by a [`knife.rb`](http://docs.opscode.com/config_rb_knife.html) file, which should be located in a `.chef` directory. Head Chef will use the closest `.chef/knife.rb` found in its or its parents directories, identical to the Chef CLI tool [Knife](http://docs.opscode.com/knife.html). 
 
 **Head Chef must be run in the root of a `git` repository.**
 
-_Note: It is up to the user to manage the Berksfile and Berksfile.lock_
+_Note: It is up to the user to manage the `Berksfile` and `Berksfile.lock`_
 ##Environment
 The following commands are under `head-chef env` and perform actions on Chef Environments. 
 
-**By default, the Chef Environment used will match the current git branch.** 
+**By default, the Chef Environment used will match the current `git` branch.** 
 
 For example if the current git branch is `test`, these commands will be run against the Chef Environment named `test`, if it exists.
 
@@ -62,7 +64,7 @@ REMOVE:
 ```
 
 ###list
-View Chef Environment cookbooks version contraints
+View Chef Environment's cookbook version constraints
 
 ```
 $ head-chef env list
@@ -79,17 +81,17 @@ COOKBOOKS:
 ```
 
 ###sync
-`sync` local Berksfile's cookbook version constraints with Chef Environment. 
+`sync` local `Berksfile`'s cookbook version constraints with Chef Environment. 
 
 **The Chef Environment will be created if it does not exist.**
 
-`sync` will also ensure all cookbooks in the environment are present on Chef Server, and that the cookbooks contain the correct content for their version. 
+`sync` ensures all cookbooks in the environment are present on Chef Server, and are identical to the source specified in the `Berksfile`, minus files specified via `chefignore`. 
 
 ```
 $ head-chef env sync
 ```
 
-A conflict will arise when a cookbook to be uploaded matches a cookbook on Chef Server in version number, but the cookbooks do not have the same content. In general, conflicts will arise when a cookbook has been updated, but the version number was not changed. More often than not, this should be resolved by simply updating the cookbook version number, however, the force option can be used to overwrite the remote cookbook on Chef Server with the local version of the cookbook. This should only be used in exceptional circumstances.
+A conflict will arise when a cookbook to be uploaded matches a cookbook on Chef Server in version number, but does not have the same content. In general, conflicts will arise when a cookbook has been updated, but the version number was not changed. More often than not, this should be resolved by simply updating the cookbook version number, however, the force option can be used to overwrite the remote cookbook on Chef Server with the local version of the cookbook. This should only be used in exceptional circumstances.
 
 ``` 
 $ head-chef env sync --force
@@ -137,41 +139,43 @@ Use --force to sync environment
 ```
 
 #Workflow
-Head Chef is meant to be run inside a **master cookbook**. A **master cookbook** is simply a git repository which has branches associated with Chef environment. Each branch has a Berksfile representing that environment's cookbook version constraints. 
+Head Chef is meant to be run inside a **master cookbook**. A **master cookbook** is simply a git repository which has branches associated with Chef Environments. Each branch has a `Berksfile` representing that Chef Environment's cookbook version constraints. 
+
+_Note: These workflows are opinated and assume the following:_
+
+- _Development and Production Chef Orgs_
 
 ##Testing/Development
 Chef Environments can easily be created with Head Chef to be used for testing/development purposes: 
 
 - Checkout **master cookbook**
 - Create a new branch
-- Edit Berksfile 
-- Update Berksfile.lock
-- head-chef env sync
+- Edit `Berksfile` 
+- Update `Berksfile.lock`
+- `head-chef env sync`
 
 These environments can be versioned by committing the branch back to the **master cookbook**, via pull request.
 
-##Cookbook Promotion
-The following outlines a typical cookbook workflow in order to demonstate where Head Chef fits in the process:
+##Cookbook Development
+The following outlines a potential cookbook workflow. It does not involve Head Chef, however, creating/syncing environments with Head Chef provides the benefit of preventing cookbook leakage. All cookbooks that would be used within the environment are pinned at specific versions, and this is key for allowing automated cookbook promotion. While still in development, it is important to test cookbooks changes, making sure they do not break other test environments in use.
 
 - Update Chef cookbook until it is deemed ready for promotion (e.g. new version)
-- Checkout `MasterCookbook`
-- Checkout/create branch matching Chef Environment
-- Edit Berksfile to include updated cookbook
-- Update Berksfile.lock to include updated cookbook as well as resolve any new dependencies
-- `head-chef env sync`
+- Release new version of cookbook (merge to master)
+- Upload new version of cookbook to Chef Server, in the development Chef Org
+- Queue CI server build  where role cookbooks are tested against `_default` Chef Environment in development Chef Org. 
+  - `_default` Chef Environment holds latest cookbooks, not present in environment constraints
+- Successful test of role cookbooks indicates environments in **master cookbook** can be updated
 
-Similarly, all changes to environments can be versioned by committing back to the **master cookbook** repository. 
-
-##Production
+##Cookbook Promotion/Production
 Updates to production occur in a similar fashion, but will most likely have more systems in place. Therefore, let's outline a full Chef Cookbook update workflow in production. 
 
-- Update Chef cookbook until it is deemed ready for promotion (e.g. new version)
+- Update Chef cookbook until it is deemed ready for production (e.g. new version)
 - Checkout **master cookbook**
 - Checkout/create branch matching Chef Environment
-- Edit Berksfile to include updated cookbook
-- Update Berksfile.lock to include updated cookbook as well as resolve any new dependencies
+- Edit `Berksfile` to include updated cookbook
+- Update `Berksfile.lock` to include updated cookbook as well as resolve any new dependencies
 - Make pull request to **master cookbook**
-- Pull request queues CI server build where required role cookbooks are tested in new/updated environment
+- Pull request queues CI server build where role cookbooks are tested in new/updated environment
 - Once environment build passes, pull request is ready for merge
 - After merge, environment and cookbooks can be updated via `head-chef env sync`
 
