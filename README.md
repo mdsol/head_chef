@@ -141,7 +141,7 @@ Use --force to sync environment
 #Workflow
 Head Chef is meant to be run inside a **master cookbook**. A **master cookbook** is simply a git repository which has branches associated with Chef Environments. Each branch has a `Berksfile` representing that Chef Environment's cookbook version constraints. 
 
-_Note: These workflows are opinated and assume the following:_
+_Note: These workflows are opinionated and assume the following:_
 
 - _Development and Production Chef Orgs_
 
@@ -162,7 +162,7 @@ The following outlines a potential cookbook workflow. It does not involve Head C
 - Update Chef cookbook until it is deemed ready for promotion (e.g. new version)
 - Release new version of cookbook (merge to master)
 - Upload new version of cookbook to Chef Server, in the development Chef Org
-- Queue CI server build  where role cookbooks are tested against `_default` Chef Environment in development Chef Org. 
+- Queue CI server build where role cookbooks are tested against `_default` Chef Environment in development Chef Org.
   - `_default` Chef Environment holds latest cookbooks, not present in environment constraints
 - Successful test of role cookbooks indicates environments in **master cookbook** can be updated
 
