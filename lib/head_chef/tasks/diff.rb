@@ -23,7 +23,7 @@ module HeadChef
         cookbook_name = berkshelf_cookbook.name.chomp("-#{berkshelf_cookbook.version}")
 
         if chef_versions[cookbook_name]
-          chef_version = chef_versions[cookbook_name]
+          chef_version = chef_versions[cookbook_name][/[\d\.]+$/]
         else
           chef_version = nil
         end
